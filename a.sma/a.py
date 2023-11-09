@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 
 
-matplotlib.use("agg")  # Set Matplotlib backend
-import matplotlib.pyplot as plt
+# matplotlib.use("agg")  # Set Matplotlib backend
+# import matplotlib.pyplot as plt
 
 
 def get_data():
