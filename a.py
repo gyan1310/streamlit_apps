@@ -7,7 +7,7 @@ import pandas as pd
 
 
 def get_data():
-    segments_df = pd.read_csv("raw_data_15_MIN.csv")
+    segments_df = pd.read_csv("raw_data_15_min.csv")
     segments_df.set_index("Date", inplace=True)
     segments_df = pd.DataFrame(segments_df)
     return segments_df
