@@ -1,6 +1,11 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.use("agg")  # Set Matplotlib backend
+import matplotlib.pyplot as plt
+
 
 def get_data():
     segments_df = pd.read_csv("raw_data_15_MIN.csv")
