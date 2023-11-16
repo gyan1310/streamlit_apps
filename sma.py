@@ -453,7 +453,7 @@ def perform_trades(data):
             long += 1
             profit = trade_value * abs(data["Returns"].iloc[i] / 100) 
             portfolio_value += profit
-        elif data["Segment Type"].iloc[i] == "down" and data["Returns"].iloc[i] < 0:
+        elif data["Segment Type"].iloc[i] == "down" and data["Returns"].iloc[i] > 0:
             short += 1
             profit = trade_value * abs(data["Returns"].iloc[i] / 100) 
             portfolio_value += profit
@@ -461,7 +461,7 @@ def perform_trades(data):
             l_long += 1
             loss = trade_value * abs(data["Returns"].iloc[i] / 100) 
             portfolio_value -= loss
-        elif data["Segment Type"].iloc[i] == "down" and data["Returns"].iloc[i] > 0:
+        elif data["Segment Type"].iloc[i] == "down" and data["Returns"].iloc[i] < 0:
             s_short += 1
             loss = trade_value * abs(data["Returns"].iloc[i] / 100) 
             portfolio_value -= loss
@@ -471,8 +471,6 @@ def perform_trades(data):
     st.write("Short Trades:", short)
     st.write("Unsuccessful Short Trades:", s_short)
     st.write("Final Portfolio Value:", portfolio_value)
-    st.write("Long Losses:", l_long)
-    st.write("Short Losses:", s_short)
 
 # Streamlit App
 st.title("SMA Analysis")
