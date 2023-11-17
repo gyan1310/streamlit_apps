@@ -309,18 +309,230 @@
 #     st.write("Profit and Loss:")
 #     st.write(pnl)
 
+# import streamlit as st
+# import pandas as pd
+
+# def get_data():
+#     df = pd.read_csv("raw_data_15_min.csv")
+#     df.set_index("Date", inplace=True)
+#     return df
+
+# def calculate_sma(data, sma_s, sma_l):
+#     data['SMA_S'] = data['Close'].rolling(sma_s).mean().to_numpy()
+#     data['SMA_M'] = data['Close'].rolling(sma_l).mean().to_numpy()
+#     data = data.dropna()  # Drop rows with NaN values
+#     return data
+
+# def find_up_down(data):
+#     up_indices = []
+#     down_indices = []
+
+#     for i in range(1, len(data)):
+#         if data['SMA_S'][i] > data['SMA_M'][i] and data['SMA_S'][i - 1] <= data['SMA_M'][i - 1]:
+#             up_indices.append(i)
+
+#         if data['SMA_S'][i] < data['SMA_M'][i] and data['SMA_S'][i - 1] >= data['SMA_M'][i - 1]:
+#             down_indices.append(i)
+
+#     return up_indices, down_indices
+
+# def analyze_segments(data, up_indices, down_indices):
+#     merged_indices = sorted(up_indices + down_indices)
+    
+#     segment_types = []
+#     start_indices = []
+#     end_indices = []
+#     reference_close_prices = []
+#     highest_high_prices = []
+#     lowest_low_prices = []
+#     segment_dates = []
+
+#     for i in range(len(merged_indices) - 1):
+#         start_idx = merged_indices[i]
+#         end_idx = merged_indices[i + 1]
+
+#         if start_idx in up_indices:
+#             segment_type = "up"
+#         else:
+#             segment_type = "down"
+
+#         reference_close_price = data['Close'][start_idx]
+#         highest_high_price = data['High'][start_idx:end_idx].max()
+#         lowest_low_price = data['Low'][start_idx:end_idx].min()
+#         segment_date = data.index[start_idx]
+
+#         segment_types.append(segment_type)
+#         start_indices.append(start_idx)
+#         end_indices.append(end_idx)
+#         reference_close_prices.append(reference_close_price)
+#         highest_high_prices.append(highest_high_price)
+#         lowest_low_prices.append(lowest_low_price)
+#         segment_dates.append(segment_date)
+
+#     df = pd.DataFrame({
+#         'Segment Type': segment_types,
+#         'Start Index': start_indices,
+#         'End Index': end_indices,
+#         'Reference Close Price': reference_close_prices,
+#         'Highest High Price': highest_high_prices,
+#         'Lowest Low Price': lowest_low_prices,
+#         'Segment Date': segment_dates
+#     })
+#     df['% High Price Difference'] = (df['Highest High Price'] - df['Reference Close Price']) / df['Reference Close Price'] * 100
+#     df['% Low Price Difference'] = (df['Lowest Low Price'] - df['Reference Close Price']) / df['Reference Close Price'] * 100
+#     df['% up-down Difference'] = df['Reference Close Price'].pct_change() * 100
+#     df['% up-down Difference'].fillna(0, inplace=True)  # Replace NaN values with 0 for the first row
+#     df["bars taken"] = df["End Index"] - df["Start Index"] 
+#     df['% up-down Difference'] = df['% up-down Difference'].shift(-1)
+#     df['trade_close'] = df['Reference Close Price'].shift(-1)
+#     df["Returns"] = df["% up-down Difference"]
+#     df.loc[df['Segment Type'] == 'down', 'Returns'] *= -1
+#     return df
+
+# def calculate_profit_losses(df):
+#     long_profit_trades = 0
+#     long_losses_trades = 0
+#     short_profit_trades = 0
+#     short_losses_trades = 0
+#     long_profit = []
+#     long_loss = []
+#     short_profit = []
+#     short_loss = []
+#     total_trades = 0
+#     profitablity_percent = 0
+    
+#     for i in range(len(df)):
+#         if df["Segment Type"][i] == "up" and df["Returns"][i] > 0:
+#             long_profit_trades += 1
+#             long_profit.append(df["Returns"][i])
+#         elif df["Segment Type"][i] == "up" and df["Returns"][i] < 0:
+#             long_losses_trades += 1
+#             long_loss.append(df["Returns"][i])
+
+#         if df["Segment Type"][i] == "down" and df["Returns"][i] > 0:
+#             short_profit_trades += 1
+#             short_profit.append(df["Returns"][i])
+#         elif df["Segment Type"][i] == "down" and df["Returns"][i] < 0:
+#             short_losses_trades += 1
+#             short_loss.append(df["Returns"][i])
+#         total_trades = (long_profit_trades
+#                         + long_losses_trades
+#                         +short_profit_trades
+#                         + short_losses_trades)
+#         profitablity_percent = ((total_trades -(long_losses_trades+ short_losses_trades))
+#                                 / total_trades)*100
+
+#     return pd.DataFrame({
+#         'sma_s': [sma_s],
+#         'sma_l': [sma_l],
+#         'long_profit_trades': [long_profit_trades],
+#         'long_losses_trades': [long_losses_trades],
+#         'short_profit_trades': [short_profit_trades],
+#         'short_losses_trades': [short_losses_trades],
+#         'sum_long_profit': [sum(long_profit)],
+#         'sum_long_loss': [sum(long_loss)],
+#         'sum_short_profit': [sum(short_profit)],
+#         'sum_short_loss': [sum(short_loss)],
+#         'total_trades': [total_trades],
+#         'profitability_percent': [profitablity_percent]
+#     })
+
+# def perform_trades(data):
+#     long = 0 
+#     l_long = 0
+#     short = 0
+#     s_short = 0
+#     tp_long = 0.1
+#     tp_short = -0.1
+#     trade_value = 100
+#     portfolio_value = 100
+#     loss = 0
+#     count = 0
+#     for i in range(len(data)-1):
+#         if data["Segment Type"].iloc[i] == "up" and data["Returns"].iloc[i] > 0:
+#             long += 1
+#             profit = trade_value * abs(data["Returns"].iloc[i] / 100) 
+#             portfolio_value += profit
+#         elif data["Segment Type"].iloc[i] == "down" and data["Returns"].iloc[i] > 0:
+#             short += 1
+#             profit = trade_value * abs(data["Returns"].iloc[i] / 100) 
+#             portfolio_value += profit
+#         elif data["Segment Type"].iloc[i] == "up" and data["Returns"].iloc[i] < 0:
+#             l_long += 1
+#             loss = trade_value * abs(data["Returns"].iloc[i] / 100) 
+#             portfolio_value -= loss
+#         elif data["Segment Type"].iloc[i] == "down" and data["Returns"].iloc[i] < 0:
+#             s_short += 1
+#             loss = trade_value * abs(data["Returns"].iloc[i] / 100) 
+#             portfolio_value -= loss
+
+#     st.write("Long Trades:", long)
+#     st.write("Unsuccessful Long Trades:", l_long)
+#     st.write("Short Trades:", short)
+#     st.write("Unsuccessful Short Trades:", s_short)
+#     st.write("Final Portfolio Value:", portfolio_value)
+
+# # Streamlit App
+# st.title("SMA Analysis")
+
+# # Input parameters
+# sma_s = st.slider("Select sma_s", min_value=1, max_value=100, value=7)
+# sma_l = st.slider("Select sma_l", min_value=1, max_value=250, value=21)
+
+# # Button to trigger analysis
+# if st.button("Run Analysis"):
+#     # Calculate SMA
+#     df = get_data()
+#     data = calculate_sma(data=df, sma_s=sma_s, sma_l=sma_l)
+#     up_indices, down_indices = find_up_down(data)
+#     segments_df = analyze_segments(data, up_indices, down_indices)
+#     segments_df.to_csv(f"sma_{sma_s}_{sma_l}.csv", index=False)
+
+#     # Display results
+#     st.write("Segments Data:")
+#     st.write(segments_df)
+
+#     total_returns = segments_df["Returns"].sum()
+#     pnl = calculate_profit_losses(segments_df)
+
+#     # Display P&L
+#     st.write("Profit and Loss:")
+#     st.write(pnl)
+
+#     # Perform trades
+#     perform_trades(segments_df)
+
+
 import streamlit as st
 import pandas as pd
+import numpy as np
 
 def get_data():
-    df = pd.read_csv("raw_data_15_min.csv")
+    df = pd.read_csv("linkedin.csv")
     df.set_index("Date", inplace=True)
     return df
 
-def calculate_sma(data, sma_s, sma_l):
-    data['SMA_S'] = data['Close'].rolling(sma_s).mean().to_numpy()
-    data['SMA_M'] = data['Close'].rolling(sma_l).mean().to_numpy()
-    data = data.dropna()  # Drop rows with NaN values
+def calculate_sma(data, sma_s, sma_l, ma_type):
+    if ma_type == "EMA_SMA":
+        data['SMA_S'] = data['Close'].ewm(span=sma_s, adjust=False).mean()
+        data['SMA_M'] = data['Close'].rolling(window=sma_l).mean()
+        data = data.dropna()
+        
+    elif ma_type == "SMA_EMA":
+        data['SMA_S'] = data['Close'].rolling(window=sma_s).mean()
+        data['SMA_M'] = data['Close'].ewm(span=sma_l, adjust=False).mean()
+        data = data.dropna()
+        
+    elif ma_type == "SMA_SMA":
+        data['SMA_S'] = data['Close'].rolling(window=sma_s).mean()
+        data['SMA_M'] = data['Close'].rolling(window=sma_l).mean()
+        data = data.dropna()
+        
+    elif ma_type == "EMA_EMA":
+        data['SMA_S'] = data['Close'].ewm(span=sma_s, adjust=False).mean()
+        data['SMA_M'] = data['Close'].ewm(span=sma_l, adjust=False).mean()
+        data = data.dropna()
+        
     return data
 
 def find_up_down(data):
@@ -347,7 +559,7 @@ def analyze_segments(data, up_indices, down_indices):
     lowest_low_prices = []
     segment_dates = []
 
-    for i in range(len(merged_indices) - 1):
+    for i in range(len(merged_indices)-1):
         start_idx = merged_indices[i]
         end_idx = merged_indices[i + 1]
 
@@ -389,7 +601,7 @@ def analyze_segments(data, up_indices, down_indices):
     df.loc[df['Segment Type'] == 'down', 'Returns'] *= -1
     return df
 
-def calculate_profit_losses(df):
+def calculate_profit_losses(df, trade_type, sma_s, sma_l):
     long_profit_trades = 0
     long_losses_trades = 0
     short_profit_trades = 0
@@ -399,105 +611,119 @@ def calculate_profit_losses(df):
     short_profit = []
     short_loss = []
     total_trades = 0
-    profitablity_percent = 0
+    trade_value = 100
+    portfolio_value = 0
+
     
     for i in range(len(df)):
-        if df["Segment Type"][i] == "up" and df["Returns"][i] > 0:
-            long_profit_trades += 1
-            long_profit.append(df["Returns"][i])
-        elif df["Segment Type"][i] == "up" and df["Returns"][i] < 0:
-            long_losses_trades += 1
-            long_loss.append(df["Returns"][i])
+        if trade_type == "Long":
+            
+            if df["Segment Type"][i] == "up" and df["Returns"][i] > 0:
+                long_profit_trades += 1
+                long_profit.append(df["Returns"][i])
+                profit = trade_value * abs(df["Returns"][i] / 100) 
+                portfolio_value += profit
+            
+            elif df["Segment Type"][i] == "up" and df["Returns"][i] < 0:
+                long_losses_trades += 1
+                long_loss.append(df["Returns"][i])
+                loss = trade_value * abs(df["Returns"][i] / 100) 
+                portfolio_value -= loss
+                
+            total_trades = (long_profit_trades
+                            + long_losses_trades)
+                
+        elif trade_type == "Short":
+            
+            if df["Segment Type"][i] == "down" and df["Returns"][i] > 0:
+                short_profit_trades += 1
+                short_profit.append(df["Returns"][i])
+                profit = trade_value * abs(df["Returns"][i] / 100) 
+                portfolio_value += profit
 
-        if df["Segment Type"][i] == "down" and df["Returns"][i] > 0:
-            short_profit_trades += 1
-            short_profit.append(df["Returns"][i])
-        elif df["Segment Type"][i] == "down" and df["Returns"][i] < 0:
-            short_losses_trades += 1
-            short_loss.append(df["Returns"][i])
-        total_trades = (long_profit_trades
-                        + long_losses_trades
-                        +short_profit_trades
-                        + short_losses_trades)
-        profitablity_percent = ((total_trades -(long_losses_trades+ short_losses_trades))
-                                / total_trades)*100
+            elif df["Segment Type"][i] == "down" and df["Returns"][i] < 0:
+                short_losses_trades += 1
+                short_loss.append(df["Returns"][i])
+                loss = trade_value * abs(df["Returns"][i] / 100) 
+                portfolio_value -= loss
+                
+            total_trades = (short_profit_trades
+                            + short_losses_trades)
+                
+        elif trade_type == "Both":
+            
+            if df["Segment Type"][i] == "up" and df["Returns"][i] > 0:
+                long_profit_trades += 1
+                long_profit.append(df["Returns"][i])
+                profit = trade_value * abs(df["Returns"][i] / 100) 
+                portfolio_value += profit
+
+            elif df["Segment Type"][i] == "up" and df["Returns"][i] < 0:
+                long_losses_trades += 1
+                long_loss.append(df["Returns"][i])
+                loss = trade_value * abs(df["Returns"][i] / 100) 
+                portfolio_value -= loss
+
+            if df["Segment Type"][i] == "down" and df["Returns"][i] > 0:
+                short_profit_trades += 1
+                short_profit.append(df["Returns"][i])
+                profit = trade_value * abs(df["Returns"][i] / 100) 
+                portfolio_value += profit
+
+            elif df["Segment Type"][i] == "down" and df["Returns"][i] < 0:
+                short_losses_trades += 1
+                short_loss.append(df["Returns"][i])
+                loss = trade_value * abs(df["Returns"][i] / 100) 
+                portfolio_value -= loss
+            
+            total_trades = (long_profit_trades
+                            + long_losses_trades
+                            +short_profit_trades
+                            + short_losses_trades)
+
 
     return pd.DataFrame({
         'sma_s': [sma_s],
         'sma_l': [sma_l],
-        'long_profit_trades': [long_profit_trades],
-        'long_losses_trades': [long_losses_trades],
-        'short_profit_trades': [short_profit_trades],
-        'short_losses_trades': [short_losses_trades],
-        'sum_long_profit': [sum(long_profit)],
-        'sum_long_loss': [sum(long_loss)],
-        'sum_short_profit': [sum(short_profit)],
-        'sum_short_loss': [sum(short_loss)],
-        'total_trades': [total_trades],
-        'profitability_percent': [profitablity_percent]
+        'trade_type': [trade_type],
+        'long_profit_trades': (long_profit_trades),
+        'long_losses_trades': (long_losses_trades),
+        'short_profit_trades': (short_profit_trades),
+        'short_losses_trades': (short_losses_trades),
+        'sum_long_profit': sum(long_profit),
+        'sum_long_loss': sum(long_loss),
+        'sum_short_profit': sum(short_profit),
+        'sum_short_loss': sum(short_loss),
+        'total_trades': total_trades,
+        "portfolio_value" : portfolio_value
+
     })
 
-def perform_trades(data):
-    long = 0 
-    l_long = 0
-    short = 0
-    s_short = 0
-    tp_long = 0.1
-    tp_short = -0.1
-    trade_value = 100
-    portfolio_value = 100
-    loss = 0
-    count = 0
-    for i in range(len(data)-1):
-        if data["Segment Type"].iloc[i] == "up" and data["Returns"].iloc[i] > 0:
-            long += 1
-            profit = trade_value * abs(data["Returns"].iloc[i] / 100) 
-            portfolio_value += profit
-        elif data["Segment Type"].iloc[i] == "down" and data["Returns"].iloc[i] > 0:
-            short += 1
-            profit = trade_value * abs(data["Returns"].iloc[i] / 100) 
-            portfolio_value += profit
-        elif data["Segment Type"].iloc[i] == "up" and data["Returns"].iloc[i] < 0:
-            l_long += 1
-            loss = trade_value * abs(data["Returns"].iloc[i] / 100) 
-            portfolio_value -= loss
-        elif data["Segment Type"].iloc[i] == "down" and data["Returns"].iloc[i] < 0:
-            s_short += 1
-            loss = trade_value * abs(data["Returns"].iloc[i] / 100) 
-            portfolio_value -= loss
+# Streamlit app
+def main():
+    st.title("Moving Average Trading Analysis")
 
-    st.write("Long Trades:", long)
-    st.write("Unsuccessful Long Trades:", l_long)
-    st.write("Short Trades:", short)
-    st.write("Unsuccessful Short Trades:", s_short)
-    st.write("Final Portfolio Value:", portfolio_value)
+    # Sidebar options
+    sma_s = st.sidebar.slider("Select SMA Short Window", 1, 100, 21)
+    sma_l = st.sidebar.slider("Select SMA Long Window", 1, 100, 50)
+    ma_type = st.sidebar.selectbox("Select Moving Average Combination", ["EMA_SMA", "SMA_EMA", "SMA_SMA", "EMA_EMA"])
+    trade_type = st.sidebar.radio("Select Trade Type", ["Long", "Short", "Both"])
 
-# Streamlit App
-st.title("SMA Analysis")
-
-# Input parameters
-sma_s = st.slider("Select sma_s", min_value=1, max_value=100, value=7)
-sma_l = st.slider("Select sma_l", min_value=1, max_value=250, value=21)
-
-# Button to trigger analysis
-if st.button("Run Analysis"):
-    # Calculate SMA
+    # Load data and perform analysis
     df = get_data()
-    data = calculate_sma(data=df, sma_s=sma_s, sma_l=sma_l)
+    data = calculate_sma(df, sma_s, sma_l, ma_type)
     up_indices, down_indices = find_up_down(data)
     segments_df = analyze_segments(data, up_indices, down_indices)
-    segments_df.to_csv(f"sma_{sma_s}_{sma_l}.csv", index=False)
+    segments_df.to_csv(f"sma_{sma_s}_{sma_l}_{ma_type}.csv", index=False)
 
     # Display results
-    st.write("Segments Data:")
-    st.write(segments_df)
-
+    st.dataframe(segments_df)
     total_returns = segments_df["Returns"].sum()
-    pnl = calculate_profit_losses(segments_df)
+    st.info(f"Total Returns: {total_returns}")
 
-    # Display P&L
-    st.write("Profit and Loss:")
-    st.write(pnl)
+    # Calculate profit and losses
+    pnl = calculate_profit_losses(segments_df, trade_type, sma_s, sma_l)
+    st.dataframe(pnl)
 
-    # Perform trades
-    perform_trades(segments_df)
+if __name__ == "__main__":
+    main()
