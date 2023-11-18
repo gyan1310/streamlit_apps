@@ -310,12 +310,20 @@ def main():
         segments_df.to_csv(f"{symbol}_sma_{sma_s}_{sma_l}_{ma_type}_{start_date}_{end_date}.csv", index=False)
 
         # Display results
+        st.subheader("Generating Trade signals And Detailed Trade Report")
         st.dataframe(segments_df)
-        total_returns = segments_df["Returns"].sum()
-        st.info(f"Total Returns: {total_returns} %")
+        # total_returns = segments_df["Returns"].sum()
+        # st.info(f"Total Returns: {total_returns} %")
 
         # Calculate profit and losses
         pnl_summary, pnl_portfolio = calculate_profit_losses(segments_df, trade_type, sma_s, sma_l)
+        total_returns = pnl_summary["portfolio_value"].iloc[0]
+        st.info(f"Total Returns: {total_returns} %")
+
+        # Calculate profit and losses
+        # pnl_summary, pnl_portfolio = calculate_profit_losses(segments_df, trade_type, sma_s, sma_l)
+        # st.dataframe(pnl_summary)
+        st.subheader("Trade_Stasts")
         st.dataframe(pnl_summary)
         
         # Display results
