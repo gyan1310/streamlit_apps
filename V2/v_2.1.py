@@ -339,6 +339,8 @@ def main():
         
         st.subheader("Trade_summary")
         st.bar_chart(pnl_summary[['long_profit_trades', 'short_profit_trades', 'total_trades']])
+        st.header("Contact Info")
+        st.write("Email: tech67451@gmail.com")
 
 
 if __name__ == "__main__":
