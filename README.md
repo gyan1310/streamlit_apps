@@ -1,4 +1,4 @@
-Certainly! Below is a user guide for someone who is not familiar with the code but wants to use the provided Streamlit app for Moving Average Trading Analysis:
+
 
 ---
 
