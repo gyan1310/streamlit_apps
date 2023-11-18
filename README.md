@@ -1,5 +1,4 @@
 
-
 ---
 
 ## Moving Average Trading Analysis User Guide
