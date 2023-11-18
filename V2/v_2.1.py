@@ -318,6 +318,7 @@ def main():
         # Calculate profit and losses
         pnl_summary, pnl_portfolio = calculate_profit_losses(segments_df, trade_type, sma_s, sma_l)
         total_returns = pnl_summary["portfolio_value"].iloc[0]
+        st.subheader("Strategy_performance")
         st.info(f"Total Returns: {total_returns} %")
 
         # Calculate profit and losses
@@ -327,10 +328,10 @@ def main():
         st.dataframe(pnl_summary)
         
         # Display results
-        st.subheader("Trading Signals")
+        st.subheader("Trading_Signals")
         st.line_chart(data[['Close', 'SMA_S', 'SMA_M']])
         
-        st.subheader("Equity Curve")
+        st.subheader("Equity_Curve")
         st.line_chart(pnl_portfolio['portfolio_value'])
         
         st.subheader("Returns_chart")
