@@ -10,7 +10,7 @@ import seaborn as sns
 from datetime import date
 
 st.set_page_config(page_icon=":bar_chart:", layout="wide")
-
+st.title(":bar_chart:")
 def get_data(symbol, start, end):
     df = yf.download(symbol, start=start, end=end)   
     return df
