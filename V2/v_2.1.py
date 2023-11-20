@@ -9,8 +9,6 @@ import datetime
 import seaborn as sns
 from datetime import date
 
-st.set_page_config(page_title="Trading Strategy Dashboard", page_icon=":bar_chart:", layout="wide")
-
 st.set_page_config(page_icon=":bar_chart:", layout="wide")
 st.title(":bar_chart: AB Tech")
 def get_data(symbol, start, end):
@@ -213,6 +211,7 @@ def calculate_profit_losses(df, trade_type, sma_s, sma_l):
 
 # Streamlit app
 def main():
+    st.set_page_config(page_title="Trading Strategy Dashboard", page_icon=":bar_chart:", layout="wide")
     st.title("Moving Average Trading Analysis")
     guide_placeholder = st.empty()
 
