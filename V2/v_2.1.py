@@ -306,6 +306,7 @@ def main():
         
     if st.sidebar.button("Test"):
         if interval == "15m" or interval == "30m" or interval == "1h":
+            st.write(f"You have selected {interval} so the strategy will be tested for 60 days only due to limitation of yfinance library")
             max_date = date.today()
             start_date = (max_date - timedelta(days=59)).strftime('%Y-%m-%d')
             end_date = max_date
