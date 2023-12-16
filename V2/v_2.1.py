@@ -298,14 +298,14 @@ def main():
     default_start_date = datetime.date(2014, 1, 1)
     start_date = st.sidebar.date_input("Start Date", value = default_start_date, max_value=max_date)
     end_date = st.sidebar.date_input("End Date", max_value=max_date)
-    interval = st.sidebar.selectbox("select time interval", ["15m", "30m", "1h", "1d"])
+    interval = st.sidebar.selectbox("select time interval", ["5m","15m", "30m", "1h", "1d"])
     sma_s = st.sidebar.slider("Select SMA Short Window", 1, 100, 21)
     sma_l = st.sidebar.slider("Select SMA Long Window", 1, 100, 50)
     ma_type = st.sidebar.selectbox("Select Moving Average Combination", ["EMA_SMA", "SMA_EMA", "SMA_SMA", "EMA_EMA"])
     trade_type = st.sidebar.radio("Select Trade Type", ["Long", "Short", "Both"])
         
     if st.sidebar.button("Test"):
-        if interval == "15m" or interval == "30m" or interval == "1h":
+        if interval == "5m" or interval == "15m" or interval == "30m" or interval == "1h":
             st.write(f"You have selected {interval} so the strategy will be tested for 60 days only due to limitation of yfinance library soon we will work towords this to facilitate the feature so you can test the strategy over a desired date range")
             max_date = date.today()
             start_date = (max_date - timedelta(days=59)).strftime('%Y-%m-%d')
