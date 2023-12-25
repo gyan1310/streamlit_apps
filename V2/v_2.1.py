@@ -420,6 +420,7 @@ def main():
         # st.dataframe(pnl_summary)
         st.subheader("Trade_Stasts")
         st.dataframe(pnl_summary)
+        st.dataframe(trades_df)
         
         # Display results
         st.subheader("Trading_Signals")
