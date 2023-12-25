@@ -379,6 +379,8 @@ def main():
     start_date = st.sidebar.date_input("Start Date", value = default_start_date, max_value=max_date)
     end_date = st.sidebar.date_input("End Date", max_value=max_date)
     interval = st.sidebar.selectbox("select time interval", ["5m","15m", "30m", "1h", "1d"])
+    stop_loss_percent = st.sidebar.number_input("enter the stop loss percentage", value = 2)
+    take_profit_percent = st.sidebar.number_input("enter the take profit percentage", value = 1)
     sma_s = st.sidebar.slider("Select SMA Short Window", 1, 100, 21)
     sma_l = st.sidebar.slider("Select SMA Long Window", 1, 100, 50)
     ma_type = st.sidebar.selectbox("Select Moving Average Combination", ["EMA_SMA", "SMA_EMA", "SMA_SMA", "EMA_EMA"])
@@ -408,7 +410,7 @@ def main():
         # st.info(f"Total Returns: {total_returns} %")
 
         # Calculate profit and losses
-        pnl_summary, pnl_portfolio = calculate_profit_losses(segments_df, trade_type, sma_s, sma_l)
+        pnl_summary, pnl_portfolio, trades_df = calculate_profit_losses(segments_df, trade_type, sma_s, sma_l, stop_loss_percent, take_profit_percent)
         total_returns = pnl_summary["portfolio_value"].iloc[0]
         st.subheader("Strategy_performance")
         st.info(f"Total Returns: {total_returns} %")
