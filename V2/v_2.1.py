@@ -9,7 +9,8 @@ import numpy as np
 import datetime
 import seaborn as sns
 from datetime import date
-
+st.set_page_config(page_icon=":bar_chart:", layout="wide")
+st.title(":bar_chart: AB Tech")
 def get_data(symbol, start, end, interval ):
     df = yf.download(symbol, start=start, end=end, interval = interval)   
     # df.index = df.index.tz_localize('UTC').tz_convert('Asia/Kolkata')
