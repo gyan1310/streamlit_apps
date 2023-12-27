@@ -12,7 +12,7 @@ from datetime import date
 
 def get_data(symbol, start, end, interval ):
     df = yf.download(symbol, start=start, end=end, interval = interval)   
-    df.index = df.index.tz_localize('UTC').tz_convert('Asia/Kolkata')
+    # df.index = df.index.tz_localize('UTC').tz_convert('Asia/Kolkata')
     return df
 
 def calculate_sma(data, sma_s, sma_l, ma_type):
