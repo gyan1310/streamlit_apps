@@ -10,11 +10,9 @@ import datetime
 import seaborn as sns
 from datetime import date
 
-st.set_page_config(page_icon=":bar_chart:", layout="wide")
-st.title(":bar_chart: AB Tech")
 def get_data(symbol, start, end, interval ):
     df = yf.download(symbol, start=start, end=end, interval = interval)   
-    # df.index = df.index.tz_localize('UTC').tz_convert('Asia/Kolkata')
+    df.index = df.index.tz_localize('UTC').tz_convert('Asia/Kolkata')
     return df
 
 def calculate_sma(data, sma_s, sma_l, ma_type):
@@ -134,7 +132,8 @@ def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, tak
                     trades.append({
                            "Direction": "long",
                            "Status": "✅",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "Long tp hit"})
                 
                 elif df["Low"][i] < -(stop_loss_percent):
                     stop_loss = trade_value * stop_loss_percent / 100
@@ -144,17 +143,19 @@ def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, tak
                     trades.append({
                            "Direction": "long",
                            "Status": "❌",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "Long sl hit"})
                     
                 else:
                     stop_loss = trade_value * (df["Returns"][i] / 100)
-                    portfolio_value -= stop_loss
+                    portfolio_value += stop_loss
                     long_losses_trades += 1
                     long_loss.append(stop_loss)
                     trades.append({
                            "Direction": "long",
                            "Status": "❌",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "Long cross "})
                     
                 
             total_trades = (long_profit_trades
@@ -170,7 +171,8 @@ def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, tak
                     trades.append({
                            "Direction": "short",
                            "Status": "✅",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "short tp hit"})
                     
                 elif df["High"][i] < stop_loss_percent:
                     stop_loss = trade_value * stop_loss_percent / 100
@@ -180,7 +182,8 @@ def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, tak
                     trades.append({
                            "Direction": "short",
                            "Status": "❌",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "short sl hit"})
                     
                 else:
                     stop_loss = trade_value * (df["Returns"][i] / 100)
@@ -190,13 +193,13 @@ def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, tak
                     trades.append({
                            "Direction": "short",
                            "Status": "❌",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "short cross"})
                 
             total_trades = (short_profit_trades
                             + short_losses_trades)
                 
         elif trade_type == "Both":
-            
             if df["Segment Type"][i] == "up":
                 if df["High"][i] > take_profit_percent:
                     take_profit = trade_value * take_profit_percent / 100
@@ -206,7 +209,8 @@ def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, tak
                     trades.append({
                            "Direction": "long",
                            "Status": "✅",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "Long tp hit"})
                 
                 elif df["Low"][i] < -(stop_loss_percent):
                     stop_loss = trade_value * stop_loss_percent / 100
@@ -216,29 +220,32 @@ def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, tak
                     trades.append({
                            "Direction": "long",
                            "Status": "❌",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "Long sl hit"})
                     
                 else:
                     stop_loss = trade_value * (df["Returns"][i] / 100)
-                    portfolio_value -= stop_loss
+                    portfolio_value += stop_loss
                     long_losses_trades += 1
                     long_loss.append(stop_loss)
                     trades.append({
                            "Direction": "long",
                            "Status": "❌",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "Long cross "})
+                    
 
             elif df["Segment Type"][i] == "down":
-                if df["Low"][i] <= -(take_profit_percent) :
+                if df["Low"][i] < -(take_profit_percent):
                     take_profit = trade_value * take_profit_percent / 100
                     portfolio_value += take_profit
-                    
                     short_profit_trades += 1
                     short_profit.append(take_profit)
                     trades.append({
                            "Direction": "short",
                            "Status": "✅",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "short tp hit"})
                     
                 elif df["High"][i] < stop_loss_percent:
                     stop_loss = trade_value * stop_loss_percent / 100
@@ -248,17 +255,19 @@ def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, tak
                     trades.append({
                            "Direction": "short",
                            "Status": "❌",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "short sl hit"})
                     
                 else:
                     stop_loss = trade_value * (df["Returns"][i] / 100)
-                    portfolio_value += stop_loss
+                    portfolio_value -= stop_loss
                     short_losses_trades += 1
                     short_loss.append(stop_loss)
                     trades.append({
                            "Direction": "short",
                            "Status": "❌",
-                           "portfolio_value": portfolio_value})
+                           "portfolio_value": portfolio_value,
+                           "reason" : "short cross"})
 
             total_trades = (long_profit_trades
                             + long_losses_trades
