@@ -445,7 +445,7 @@ def main():
         
         st.subheader("Trade_summary")
         st.bar_chart(pnl_summary[['long_profit_trades', 'short_profit_trades', 'total_trades']])
-        st.header("Contact Info")
+        st.sidebar.header("Contact Info")
         st.sidebar.write("Email: work.abtech@gmail.com")
         st.sidebar.write("email us for any feedback & suggestions")
 
