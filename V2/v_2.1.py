@@ -104,7 +104,7 @@ def analyze_segments(data, up_indices, down_indices):
     df.loc[df['Segment Type'] == 'down', 'Returns'] *= -1
     return df
 
-def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, take_profit_percent):
+def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, take_profit_percent, pv):
 
     long_profit_trades = 0
     long_losses_trades = 0
@@ -116,7 +116,7 @@ def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, tak
     short_loss = []
     trades = []
     total_trades = 0
-    trade_value = 4000
+    trade_value = pv
     portfolio_value = 0
     portfolio_values = []
     
@@ -392,6 +392,7 @@ def main():
     take_profit_percent = st.sidebar.number_input("enter the take profit percentage", min_value=0.1, max_value=10.0)
     sma_s = st.sidebar.slider("Select SMA Short Window", 1, 100, 21)
     sma_l = st.sidebar.slider("Select SMA Long Window", 1, 100, 50)
+    pv = st.sidebar.input(" enter trade value for each trade ")
     ma_type = st.sidebar.selectbox("Select Moving Average Combination", ["EMA_SMA", "SMA_EMA", "SMA_SMA", "EMA_EMA"])
     trade_type = st.sidebar.radio("Select Trade Type", ["Long", "Short", "Both"])
         
@@ -419,7 +420,7 @@ def main():
         # st.info(f"Total Returns: {total_returns} %")
 
         # Calculate profit and losses
-        pnl_summary, pnl_portfolio, trades_df = calculate_profit_losses(segments_df, trade_type, sma_s, sma_l, stop_loss_percent, take_profit_percent)
+        pnl_summary, pnl_portfolio, trades_df = calculate_profit_losses(segments_df, trade_type, sma_s, sma_l, stop_loss_percent, take_profit_percent, pv)
         total_returns = pnl_summary["portfolio_value"].iloc[0]
         st.subheader("Strategy_performance")
         st.info(f"Total Returns: {total_returns} %")
