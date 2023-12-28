@@ -52,7 +52,7 @@ def find_up_down(data):
 
     return up_indices, down_indices
 
-def analyze_segments(data, up_indices, down_indices):
+def analyze_segment(data, up_indices, down_indices):
     merged_indices = sorted(up_indices + down_indices)
     
     segment_types = []
@@ -105,7 +105,7 @@ def analyze_segments(data, up_indices, down_indices):
     df.loc[df['Segment Type'] == 'down', 'Returns'] *= -1
     return df
 
-def calculate_profit_losses(df, trade_type, sma_s, sma_l, stop_loss_percent, take_profit_percent, pv):
+def calculate_profit_loss(df, trade_type, sma_s, sma_l, stop_loss_percent, take_profit_percent, pv):
 
     long_profit_trades = 0
     long_losses_trades = 0
@@ -411,7 +411,7 @@ def sma_tp_sl():
 
         data = calculate_sma(df, sma_s, sma_l, ma_type)
         up_indices, down_indices = find_up_down(data)
-        segments_df = analyze_segments(data, up_indices, down_indices)
+        segments_df = analyze_segment(data, up_indices, down_indices)
         segments_df.to_csv(f"{symbol}_sma_{sma_s}_{sma_l}_{ma_type}_{start_date}_{end_date}.csv", index=False)
 
         # Display results
@@ -421,7 +421,7 @@ def sma_tp_sl():
         # st.info(f"Total Returns: {total_returns} %")
 
         # Calculate profit and losses
-        pnl_summary, pnl_portfolio, trades_df = calculate_profit_losses(segments_df, trade_type, sma_s, sma_l, stop_loss_percent, take_profit_percent, pv)
+        pnl_summary, pnl_portfolio, trades_df = calculate_profit_loss(segments_df, trade_type, sma_s, sma_l, stop_loss_percent, take_profit_percent, pv)
         total_returns = pnl_summary["portfolio_value"].iloc[0]
         st.subheader("Strategy_performance")
         st.info(f"Total Returns: {total_returns} %")
