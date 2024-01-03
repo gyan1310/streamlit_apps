@@ -392,7 +392,7 @@ def sma_tp_sl():
     stop_loss_percent = st.sidebar.number_input("enter the stop loss percentage", min_value=0.1, max_value=10.0)
     take_profit_percent = st.sidebar.number_input("enter the take profit percentage", min_value=0.1, max_value=10.0)
     sma_s = st.sidebar.slider("Select SMA Short Window", 1, 100, 21)
-    sma_l = st.sidebar.number_input("Select SMA Long Window", 1, 100, 50)
+    sma_l = st.sidebar.number_input("Select SMA Long Window", 1, 1000, 50)
     pv = st.sidebar.number_input(" enter trade value for each trade ")
     ma_type = st.sidebar.selectbox("Select Moving Average Combination", ["EMA_SMA", "SMA_EMA", "SMA_SMA", "EMA_EMA"])
     trade_type = st.sidebar.radio("Select Trade Type", ["Long", "Short", "Both"])
